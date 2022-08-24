@@ -14,20 +14,21 @@ export async function main(ns) {
 
   const allServers = scanAllServers(ns, scanned, toBeScanned);
 
-  ns.printf(Array.from(allServers).toString());
+  allServers.forEach(server => ns.print(server));
+  ns.printf('found %d servers', allServers.size);
 }
 
 /** @param {NS} ns */
 function scanAllServers(ns, scanned, toBeScanned) {
-  const scanTargets = Array.from(toBeScanned);
+  const scanTargets = [...toBeScanned];
   for (const scanTarget of scanTargets) {
     const servers = ns.scan(scanTarget);
     scanned.add(scanTarget);
     toBeScanned.delete(scanTarget);
-    servers.forEach(server => toBeScanned.add(server));
+    servers.forEach(server => !scanned.has(server) && toBeScanned.add(server));
   }
 
-  const nextScanTargets = Array.from(toBeScanned);
+  const nextScanTargets = [...toBeScanned];
   const hasScannedEvery = nextScanTargets.every(server => scanned.has(server));
   if (hasScannedEvery === true) {
     return scanned;
