@@ -36,7 +36,7 @@ export async function main(ns) {
     await ns.scp(scriptsToCopy, server, hostname);
   }
 
-  ns.spawn(config.manager, 1, JSON.stringify({ config, allServers, targetServer }));
+  ns.spawn(config.manager, 1, JSON.stringify({ config, targetServer }), ...allServers);
 }
 
 /** @param {NS} ns */
