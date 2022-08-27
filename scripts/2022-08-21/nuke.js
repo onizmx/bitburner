@@ -8,6 +8,9 @@ export async function main(ns) {
       ns.brutessh(server);
       ns.ftpcrack(server);
       ns.relaysmtp(server);
+      ns.httpworm(server);
+      ns.sqlinject(server);
+
       ns.nuke(server);
     } catch (err) {
       ns.toast(`${server} requires ${requiredPorts} ports to be opened`, 'error', 10_000);
