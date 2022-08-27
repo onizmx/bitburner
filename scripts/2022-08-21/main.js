@@ -1,4 +1,4 @@
-// run ./scripts/2022-08-21/dist.js
+// run ./scripts/2022-08-21/main.js
 
 const metadata = {
   createdDate: '2022-08-21',
@@ -6,7 +6,7 @@ const metadata = {
 
 /** @param {NS} ns */
 export async function main(ns) {
-  const distScript = `/scripts/${metadata.createdDate}/dist.js`;
+  const mainScript = `/scripts/${metadata.createdDate}/main.js`;
   const nukeScript = `/scripts/${metadata.createdDate}/nuke.js`;
   const hackScript = `/scripts/${metadata.createdDate}/hack.js`;
 
@@ -17,8 +17,8 @@ export async function main(ns) {
   serversToScp.forEach(server => serversToSkipScp.add(server));
 
   for (const server of serversToScp) {
-    await ns.scp([distScript, nukeScript, hackScript], server, hostname);
-    ns.exec(distScript, server, 1, ...serversToSkipScp);
+    await ns.scp([mainScript, nukeScript, hackScript], server, hostname);
+    ns.exec(mainScript, server, 1, ...serversToSkipScp);
   }
 
   if (serversToAccess.length > 0) {
