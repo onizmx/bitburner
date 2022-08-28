@@ -1,5 +1,4 @@
 // run ./scripts/2022-08-21/main.js
-
 const metadata = {
   createdDate: '2022-08-21',
 };
