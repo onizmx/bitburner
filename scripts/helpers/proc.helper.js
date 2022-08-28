@@ -6,14 +6,14 @@ export function killAllScripts(ns, servers) {
 }
 
 /** @param {NS} ns */
-export async function copyFilesToServers(ns, files, origin, destinations) {
+export async function copyFilesToServers(ns, origin, destinations, files) {
   for (const destination of destinations) {
     await ns.scp(files, destination, origin);
   }
 }
 
 /** @param {NS} ns */
-export function getScriptThreadCount(ns, script, server) {
+export function calculateScriptThreadCount(ns, server, script) {
   const scriptRam = ns.getScriptRam(script);
   const serverMaxRam = ns.getServerMaxRam(server);
   const serverUsedRam = ns.getServerUsedRam(server);

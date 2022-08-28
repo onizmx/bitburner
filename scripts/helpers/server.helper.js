@@ -38,7 +38,7 @@ export function nukeAllServers(ns, servers) {
 }
 
 /** @param {NS} ns */
-export function getTargetServer(ns, servers, minTargetGrowth, maxTargetHackingLevel) {
+export function findStaticTargetServer(ns, servers, minTargetGrowth, maxTargetHackingLevel) {
   const targetServer = { hostname: '', growth: 0, maxMoney: 0, currentMoney: 0 };
   for (const server of servers) {
     const requiredHackingLevel = ns.getServerRequiredHackingLevel(server);
@@ -59,18 +59,64 @@ export function getTargetServer(ns, servers, minTargetGrowth, maxTargetHackingLe
 }
 
 /** @param {NS} ns **/
-export function getAvailableServerOptions(ns) {
+export function findAllServerOptions(ns) {
   const serverOptions = [];
-  let exponent = 1;
-  while (true) {
+  const purchasedServerMaxRam = ns.getPurchasedServerMaxRam();
+  const maxExponent = Math.log2(purchasedServerMaxRam) + 1;
+  for (const exponent of [...Array(maxExponent).keys()]) {
     const ram = Math.pow(2, exponent);
     const cost = ns.getPurchasedServerCost(ram);
-    if (cost === Infinity) {
-      break;
-    }
-    serverOptions.push({ index: exponent, ram, cost });
-    exponent = exponent + 1;
+    serverOptions.push({ exponent, ram, cost });
   }
 
   return serverOptions;
+}
+
+/** @param {NS} ns **/
+export function upgradeServers(ns, dryRun, serverCount, serverNamePrefix) {
+  const serversToDelete = [];
+  const serversToPurchase = [];
+  const currentMoney = ns.getServerMoneyAvailable('home');
+  const allServerOptions = findAllServerOptions(ns);
+  const maxCostPerServer = currentMoney / serverCount;
+
+  let serverOptionToBuy;
+  for (const serverOption of allServerOptions) {
+    if (serverOption.cost > maxCostPerServer) {
+      break;
+    }
+    serverOptionToBuy = serverOption;
+  }
+  if (serverOptionToBuy == null) {
+    return null;
+  }
+
+  const purchasedServers = ns.getPurchasedServers();
+  for (const server of purchasedServers) {
+    const serverMaxRam = ns.getServerMaxRam(server);
+    if (serverMaxRam < serverOptionToBuy.ram) {
+      serversToDelete.push(server);
+    }
+    if (serversToDelete.length >= serverCount) {
+      break;
+    }
+  }
+
+  for (const _ of [...Array(serverCount).keys()]) {
+    const dateTime = new Date().toISOString();
+    const serverName = `${serverNamePrefix}-${dateTime}-${serverOptionToBuy.ram}`;
+    serversToPurchase.push(serverName);
+  }
+
+  if (dryRun === false) {
+    serversToDelete.forEach(server => ns.deleteServer(server));
+    serversToPurchase.forEach(server => ns.purchaseServer(server, serverOptionToBuy.ram));
+  }
+
+  return {
+    dryRun,
+    option: serverOptionToBuy,
+    deleted: serversToDelete,
+    purchased: serversToPurchase,
+  };
 }
