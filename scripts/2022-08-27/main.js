@@ -6,8 +6,8 @@ const metadata = {
 
 const config = {
   manager: `/scripts/${metadata.createdDate}/manager.js`,
-  actionPath: `/scripts/${metadata.createdDate}/action`,
-  action: {
+  actionsPath: `/scripts/${metadata.createdDate}/actions`,
+  actions: {
     HACK: 'hack',
     GROW: 'grow',
     WEAKEN: 'weaken',
@@ -29,8 +29,8 @@ export async function main(ns) {
   ns.printf('target hostname: %s, max money: %d', targetServer.hostname, targetServer.maxMoney);
 
   const scriptsToCopy = [];
-  Object.values(config.action).forEach(action => {
-    scriptsToCopy.push(`${config.actionPath}/${action}.js`);
+  Object.values(config.actions).forEach(action => {
+    scriptsToCopy.push(`${config.actionsPath}/${action}.js`);
   });
   for (const server of allServers) {
     await ns.scp(scriptsToCopy, server, hostname);

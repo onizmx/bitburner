@@ -6,32 +6,32 @@ export async function main(ns) {
   const { config, targetServer } = JSON.parse(data);
 
   const action = {
-    current: config.action.HACK,
-    next: config.action.HACK,
+    current: config.actions.HACK,
+    next: config.actions.HACK,
     waitTime: 0,
     waitTimeBuffer: 0.05,
   };
 
   while (true) {
     switch (action.next) {
-      case config.action.GROW:
+      case config.actions.GROW:
         action.waitTime = ns.getGrowTime(targetServer.hostname);
-        action.current = config.action.GROW;
-        action.next = config.action.WEAKEN;
+        action.current = config.actions.GROW;
+        action.next = config.actions.WEAKEN;
         break;
-      case config.action.WEAKEN:
+      case config.actions.WEAKEN:
         action.waitTime = ns.getWeakenTime(targetServer.hostname);
-        action.current = config.action.WEAKEN;
-        action.next = config.action.HACK;
+        action.current = config.actions.WEAKEN;
+        action.next = config.actions.HACK;
         break;
       default:
         action.waitTime = ns.getHackTime(targetServer.hostname);
-        action.current = config.action.HACK;
-        action.next = config.action.GROW;
+        action.current = config.actions.HACK;
+        action.next = config.actions.GROW;
         break;
     }
 
-    const actionScript = `${config.actionPath}/${action.current}.js`;
+    const actionScript = `${config.actionsPath}/${action.current}.js`;
     executeActionOnServers(ns, actionScript, allServers, targetServer.hostname);
     await ns.sleep(action.waitTime + action.waitTime * action.waitTimeBuffer);
   }
