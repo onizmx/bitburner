@@ -13,7 +13,7 @@ const config = {
     hack: `/scripts/${metadata.createdDate}/actions/hack.js`,
   },
   target: {
-    minGrowth: 20,
+    minGrowth: 40,
     maxHackingLevelFactor: 0.2,
   },
 };
